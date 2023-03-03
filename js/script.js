@@ -104,8 +104,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Modal
     const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = document.querySelector('[data-close]')
+        modal = document.querySelector('.modal')
 
     function closeModal() {
         modal.classList.add('hide')
@@ -124,10 +123,8 @@ window.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('click', openModal)
     })
 
-    modalCloseBtn.addEventListener('click', closeModal)
-
     modal.addEventListener('click', (e) => {
-        if (e.target == modal) {
+        if (e.target == modal || e.target.getAttribute('data-close') == '') {
             closeModal()
         }
     })
@@ -233,7 +230,7 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     const msg = {
-        loading: "Loading...",
+        loading: "img/spinner.svg",
         success: "Yes well done!",
         failure: "Not found"
     }
@@ -242,8 +239,14 @@ window.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault()
 
-            const StatusMassage = document.createElement('div')
-            StatusMassage.textContent = msg.loading
+            const StatusMassage = document.createElement('img')
+            StatusMassage.src = msg.loading
+            StatusMassage.style.cssText = `
+            display: block;
+            margin: 0 auto;
+            `
+            form.insertAdjacentElement('afterend', StatusMassage)
+
             form.append(StatusMassage)
             console.log(forms);
             const req = new XMLHttpRequest()
@@ -263,14 +266,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
             req.addEventListener('load', () => {
                 if (req.status === 200) {
-                    StatusMassage.textContent = msg.success
+                    showThanksModal(msg.success)
                     console.log(req.response);
                     form.reset()
                     setTimeout(() => {
                         StatusMassage.remove()
                     }, 2000)
                 } else {
-                    StatusMassage.textContent = msg.failure
+                    showThanksModal(msg.failure)
                     form.reset()
                     setTimeout(() => {
                         StatusMassage.remove()
@@ -280,6 +283,29 @@ window.addEventListener('DOMContentLoaded', () => {
         })
     }
 
+    function showThanksModal(massage) {
+        const prevModalDialog = document.querySelector('.modal__dialog')
+
+        prevModalDialog.classList.add('hide')
+        openModal()
+
+        const thanksModal = document.createElement('div')
+        thanksModal.classList.add('.modal__dialog')
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div data-close class="modal__close">&times;</div>
+                <div class="modal__title">${massage}</div>
+            </div>
+            `
+        document.querySelector('.modal').append(thanksModal)
+        setTimeout(() => {
+            thanksModal.remove()
+            prevModalDialog.classList.add('show')
+            prevModalDialog.classList.remove('hide')
+            closeModal()
+        }, 4000);
+
+    }
 
 
 
