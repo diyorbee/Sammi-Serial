@@ -247,39 +247,23 @@ window.addEventListener('DOMContentLoaded', () => {
             `
             form.insertAdjacentElement('afterend', StatusMassage)
 
-            form.append(StatusMassage)
-            console.log(forms);
-            const req = new XMLHttpRequest()
-
-            req.open('POST', 'server.php')
-            req.setRequestHeader('Content-Type', 'application/json')
-            const obj = {}
             const formData = new FormData(form)
 
-            formData.forEach((val, key) => {
-                obj[key] = val
-            })
+            // formData.forEach((val, key) => {
+            //     obj[key] = val
 
-            const json = JSON.stringify(obj)
+            fetch('server.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then((data) => data.text())
+                .then((data) =>
+                    console.log(data),
+                    showThanksModal(msg.success),
+                    StatusMassage.remove())
+                .catch(showThanksModal(msg.failure))
+                .finally(form.reset())
 
-            req.send(json)
-
-            req.addEventListener('load', () => {
-                if (req.status === 200) {
-                    showThanksModal(msg.success)
-                    console.log(req.response);
-                    form.reset()
-                    setTimeout(() => {
-                        StatusMassage.remove()
-                    }, 2000)
-                } else {
-                    showThanksModal(msg.failure)
-                    form.reset()
-                    setTimeout(() => {
-                        StatusMassage.remove()
-                    }, 2000)
-                }
-            })
         })
     }
 
@@ -304,15 +288,7 @@ window.addEventListener('DOMContentLoaded', () => {
             prevModalDialog.classList.remove('hide')
             closeModal()
         }, 4000);
-
     }
-
-
-
-
-
-
-
 
 
 
